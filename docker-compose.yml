@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: foodscanner-ai
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=8000
+    # Позволяет Docker Compose автоматически подгружать .env из текущей рабочей директории
+    env_file:
+      - .env

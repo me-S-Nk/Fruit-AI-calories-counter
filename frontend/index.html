@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FruitAI identifies fruits using artificial intelligence from uploaded images.">
+    <title>FruitAI - AI Fruit Recognition</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="background-decor">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo">
+                <i data-lucide="sparkles" class="logo-icon"></i>
+                <a href="./" style="text-decoration: none; color: white;">
+                    <h1>Fruit<span class="accent-text">AI</span></h1>
+                </a>
+            </div>
+
+            <div class="header-actions">
+                <div class="api-badge" id="apiBadge">
+                    <span class="status-indicator warning"></span>
+                    <span class="status-text" data-i18n="apiChecking">Checking API...</span>
+                </div>
+
+                <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">
+                    <i data-lucide="sun" class="sun-icon"></i>
+                    <i data-lucide="moon" class="moon-icon"></i>
+                </button>
+
+                <div class="lang-toggle" id="langToggle" aria-label="Switch language">
+                    <span class="lang-label" id="langLabel">EN</span>
+                    <span class="lang-arrow">▾</span>
+                    <div class="lang-dropdown" id="langDropdown">
+                        <button class="lang-option" data-lang="ru">🇷🇺 Русский</button>
+                        <button class="lang-option" data-lang="en">🇬🇧 English</button>
+                        <button class="lang-option" data-lang="tr">🇹🇷 Türkçe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="grid-layout">
+            <!-- Left Panel: Input -->
+            <section class="panel-card input-panel">
+                <div class="card-header">
+                    <h2><i data-lucide="camera"></i> <span data-i18n="scanTitle">Scan Product</span></h2>
+                    <p data-i18n="scanSubtitle">Upload a photo or take a shot with the camera for instant analysis</p>
+                </div>
+
+                <div class="upload-container" id="dropZone">
+                    <!-- Standard upload state -->
+                    <div class="upload-state active" id="uploadState">
+                        <i data-lucide="upload-cloud" class="upload-icon"></i>
+                        <p class="upload-text"><span data-i18n="dropText">Drag & drop a photo here or</span> <span
+                                class="browse-link" data-i18n="browseLink">browse file</span></p>
+                        <p class="file-info" data-i18n="fileInfo">Supports PNG, JPG, JPEG formats</p>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+
+                    <!-- Camera state -->
+                    <div class="camera-state" id="cameraState">
+                        <video id="cameraVideo" autoplay playsinline></video>
+                        <div class="camera-overlay"></div>
+                    </div>
+
+                    <!-- Preview state -->
+                    <div class="preview-state" id="previewState">
+                        <img id="imagePreview" src="" alt="Preview">
+                        <div class="scan-laser" id="scanLaser"></div>
+                    </div>
+
+                    <!-- Interactive Scan Controls on top of container -->
+                    <div class="camera-actions" id="cameraActions">
+                        <button class="btn btn-secondary btn-sm" id="captureBtn">
+                            <i data-lucide="aperture"></i> <span data-i18n="capture">Take Photo</span>
+                        </button>
+                        <button class="btn btn-danger btn-sm" id="cancelCameraBtn">
+                            <i data-lucide="x"></i> <span data-i18n="cancel">Cancel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="analyzeBtn" disabled>
+                        <i data-lucide="wand-2"></i> <span data-i18n="analyzeBtn">Analyze Product</span>
+                    </button>
+
+                    <button class="btn btn-secondary" id="useCameraBtn">
+                        <i data-lucide="video"></i> <span data-i18n="cameraBtn">Use Camera</span>
+                    </button>
+
+                    <button class="btn btn-demo" id="demoBtn">
+                        <i data-lucide="play-circle"></i> <span data-i18n="demoBtn">Run Demo</span>
+                    </button>
+                </div>
+
+                <div class="demo-notice" id="demoNotice">
+                    <i data-lucide="info"></i>
+                    <span><strong data-i18n="demoModeTitle">Test Mode:</strong> <span data-i18n="demoModeText">API key
+                            is not configured. You can click "Run Demo" to
+                            simulate a real product analysis.</span></span>
+                </div>
+            </section>
+
+            <!-- Right Panel: Results -->
+            <section class="panel-card results-panel">
+                <!-- Waiting State -->
+                <div class="waiting-state" id="waitingState">
+                    <div class="waiting-icon-container">
+                        <i data-lucide="scanner" class="waiting-icon"></i>
+                    </div>
+                    <h3 data-i18n="waitingTitle">Waiting for scan...</h3>
+                    <p data-i18n="waitingText">Upload a product photo and click "Analyze" to get AI-powered results.</p>
+                </div>
+
+                <!-- Results Content (hidden by default) -->
+                <div class="results-content" id="resultsContent" style="display: none;">
+                    <div class="product-header">
+                        <h2 id="resProductName">Fresh Apple</h2>
+                        <div class="badge-container">
+                            <span class="badge" id="resFreshnessBadge">Fresh</span>
+                        </div>
+                    </div>
+
+                    <!-- Calories Card -->
+                    <div class="result-card calorie-card">
+                        <div class="calorie-layout">
+                            <div class="calorie-ring-container">
+                                <div class="circular-progress">
+                                    <div class="value-container">
+                                        <span class="number" id="resTotalCalories">95</span>
+                                        <span class="unit" data-i18n="kcal">kcal</span>
+                                    </div>
+                                </div>
+                                <span class="ring-label" data-i18n="perServing">Per serving</span>
+                            </div>
+
+                            <div class="calorie-details">
+                                <div class="detail-row">
+                                    <span class="label" data-i18n="per100g">Per 100g:</span>
+                                    <span class="value accent-text" id="resCalories100g">52 kcal</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="label" data-i18n="estWeight">Est. weight:</span>
+                                    <span class="value" id="resWeight">~180 g</span>
+                                </div>
+                                <div class="disclaimer-text">
+                                    <i data-lucide="alert-circle"></i>
+                                    <span data-i18n="disclaimer">Weight and calorie calculations are
+                                        approximate.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Macronutrients (BJU) -->
+                    <div class="macros-grid">
+                        <div class="macro-item protein">
+                            <div class="macro-header">
+                                <span data-i18n="protein">Protein</span>
+                                <strong id="resProtein">0.5 g</strong>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="barProtein" style="width: 5%"></div>
+                            </div>
+                        </div>
+                        <div class="macro-item fat">
+                            <div class="macro-header">
+                                <span data-i18n="fat">Fat</span>
+                                <strong id="resFat">0.3 g</strong>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="barFat" style="width: 3%"></div>
+                            </div>
+                        </div>
+                        <div class="macro-item carbs">
+                            <div class="macro-header">
+                                <span data-i18n="carbs">Carbs</span>
+                                <strong id="resCarbs">25 g</strong>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="barCarbs" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Freshness Tracker -->
+                    <div class="result-card freshness-card">
+                        <h3><i data-lucide="shield-check"></i> <span data-i18n="freshnessTitle">Freshness
+                                Assessment</span>
+                        </h3>
+
+                        <div class="freshness-scale-wrapper">
+                            <div class="scale-labels">
+                                <span data-i18n="scaleSpoiled">Spoiled</span>
+                                <span data-i18n="scaleAvg">Average</span>
+                                <span data-i18n="scaleFresh">Fresh / Ripe</span>
+                            </div>
+                            <div class="freshness-scale-bar">
+                                <div class="freshness-fill" id="resFreshnessFill" style="width: 90%;"></div>
+                                <div class="freshness-pin" id="resFreshnessPin" style="left: 90%;"></div>
+                            </div>
+                            <div class="freshness-score">
+                                <span data-i18n="qualityIndex">Quality index:</span>
+                                <strong id="resFreshnessPercentage" class="green-text">90%</strong>
+                            </div>
+                        </div>
+
+                        <div class="visual-cues-box">
+                            <strong data-i18n="visualCues">Visual cues:</strong>
+                            <p id="resFreshnessCues">The skin is firm and glossy with a natural deep red color and light
+                                yellow streaks. No dents, signs of wilting, or mold.</p>
+                        </div>
+                    </div>
+
+                    <!-- Storage Advice -->
+                    <div class="result-card storage-card">
+                        <h3><i data-lucide="refrigerator"></i> <span data-i18n="storageTitle">Storage
+                                Recommendations</span></h3>
+                        <ul class="storage-list" id="resStorageList">
+                            <li>Store in the refrigerator crisper drawer at +2...+4°C. Apples can stay crispy this way
+                                for up to 1-2 months.</li>
+                            <li>Keep away from strong-smelling foods, as apples easily absorb foreign odors due to their
+                                porous structure.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>© 2026 FruitAI. Powered by Sulumbek Nk</p>
+    </footer>
+
+    <!-- App Logic -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
