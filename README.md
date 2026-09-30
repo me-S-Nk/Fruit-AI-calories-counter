@@ -3,6 +3,7 @@
 # 🍎 FoodScanner AI 📸
 
 **AI-powered food analysis from a single photo.**
+https://fruitai-jevh.onrender.com/
 
 Analyze food freshness, identify products, estimate calories, and get storage recommendations — powered by **Google Gemini 2.5 Flash**.
 
